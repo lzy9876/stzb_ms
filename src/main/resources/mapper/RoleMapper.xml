@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.liziy.dao.RoleDao">
+
+    <!--  对应的插入字段的名字
+        只有suffixOverrides=“,”，表示删除最后一个逗号。
+     -->
+    <sql id="key">
+        <trim suffixOverrides=",">
+            <if test="text !=null and text!=''">
+                text,
+            </if>
+            <if test="identName !=null and type !=''">
+                identName,
+            </if>
+        </trim>
+    </sql>
+
+    <!--  对应的插入字段的值  -->
+    <sql id="values">
+        <trim suffixOverrides=",">
+            <if test="text !=null and text!=''">
+                #{text},
+            </if>
+            <if test="identName !=null and type!=''">
+                #{ident_name},
+            </if>
+        </trim>
+    </sql>
+
+    <!-- role信息增加
+     keyProperty和keyColumn分别代表数据库记录主键字段和java对象成员属性名
+     -->
+    <insert id="insertRole" useGeneratedKeys="true" keyProperty="id"  keyColumn="id" parameterType="cn.liziy.entity.Role">
+        INSERT into role(<include refid="key"/>)
+        values(<include refid="values"/>)
+    </insert>
+
+<!-- role 删除  根据 id   -->
+    <delete id="deleteRoleById" parameterType="Integer">
+        DELETE
+        FROM role
+        WHERE  id = #{id}
+        LIMIT 1
+    </delete>
+
+<!--  动态查询role信息 id name ident_name  -->
+    <select id="queryRoleSelective" parameterType="cn.liziy.entity.Role"
+            resultType="cn.liziy.entity.Role">
+        SELECT
+                id,
+                text,
+                ident_name identName
+        FROM role
+        <where>
+            <if test="id != null and id != '' ">
+                AND id = #{id}
+            </if>
+            <if test="text != null and text != '' ">
+                AND text = #{text}
+            </if>
+            <if test="identName != null and identName != '' ">
+                AND ident_name = #{identName}
+            </if>
+        </where>
+    </select>
+
+<!--  根据id 修改role绑定数据  -->
+    <update id="updateRoleById" parameterType="cn.liziy.entity.Role">
+        UPDATE
+        role
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="text != null and text != ''">
+                text = #{text},
+            </if>
+            <if test="ident_name != null and ident_name != ''">
+                ident_name = #{ident_name},
+            </if>
+        </trim>
+        where id = #{id}
+        limit 1
+    </update>
+
+</mapper>
